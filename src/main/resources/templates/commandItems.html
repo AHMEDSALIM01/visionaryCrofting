@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{css/style.css}">
+    <title>Title</title>
+</head>
+<body class="vh-100 bg-light">
+    <nav class="navbar sticky-md-top navbar-expand-lg navbar-light bg-white">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                <a class="navbar-brand" href="#">Hidden brand</a>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Link</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled">Disabled</a>
+                    </li>
+                </ul>
+                <form class="d-flex">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <div>
+        <div>
+            <div class="row w-100">
+                <div class="col-3 mt-2 p-3 d-flex justify-content-center totel">
+                </div>
+                <div class="col-9 mt-3 dvs bg-white" style="border-radius: 10px;">
+                    <h3 class="p-3 mb-0 bg-white">Panier</h3>
+                    <hr class="w-100 fs-6 mx-0">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var commandeItems = getBasket();
+    let cards = document.querySelector('.dvs')
+    let tot = document.querySelector('.totel');
+    let total = getTotalPrice();
+    let commander = document.querySelector('.commander')
+    let plus = undefined;
+    function getBasket(){
+        let basket = localStorage.getItem("basket");
+        if(basket == null){
+            return [];
+        }else{
+            return JSON.parse(basket);
+        }
+    }
+    document.addEventListener("DOMContentLoaded", function(event) {
+        tot.innerHTML=`<div class="card bg-white border-0 shadow-sm ms-3 d-flex justify-content-center w-75" style="height:200px">
+                        <div class="card-body">
+                            <h5 class="mb-1">Resumé de panier</h5>
+                            <hr class="w-100 mx-0">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <h5 class="card-title"><small class="fs-6">Sous total </small></h5>
+                                    <h5 class="card-title"><span class="fs-5 fst-italic">${total} DHS</span></h5>
+                                </div>
+                                <h6 class="text-muted border-light border-bottom-2 fs-6 mb-2"><small>Frais de livraison non inclus</small></h6>
+                        </div>
+                        <button class="btn-danger btn-sm m-2 commander" >Commander( ${total} DHS )</button>
+                    </div>`
+        if(commandeItems.length>0){
+
+            for(let commandeItem of commandeItems){
+                cards.innerHTML+=`
+                           <div  class="card border-0 rounded-0 mt-0 mb-0">
+                            <div class="row g-0">
+                                <div class="col-12">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between">
+                                            <h5 class="card-title">${commandeItem.product.nom}</h5>
+                                            <h5 class="card-title">${commandeItem.price}</h5>
+                                        </div>
+                                        <p class="card-text mb-3">${commandeItem.product.descreption}</p>
+                                        <div class="d-flex justify-content-between">
+                                            <btn class="btn btn-outline-danger btn-sm" onclick="deleteFrom(${commandeItem.product.id})">X</btn>
+                                            <div class="d-flex justify-content-end">
+                                                <div class="d-flex justify-content-between align-items-center" style="width: 150px">
+                                                    <btn class="btn btn-danger btn-sm plus" onclick="changeQuantity(${commandeItem.product.id},1)">+</btn>
+                                                    <h5 class="quantity" data-quantity="${commandeItem.quantity}">${commandeItem.quantity}</h5>
+                                                    <btn class="btn btn-danger btn-sm minus" data="${commandeItem}" onclick="changeQuantity(${commandeItem.product.id},-1)">-</btn>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="w-100 fs-6 m-0">`
+            }
+        }else{
+            cards.innerHTML+=`<h5 class="card-title text-center text-muted fs-4">Panier vide</h5>`
+        }
+    }
+    );
+    function changeQuantity(product_id,quantity){
+        let basket = getBasket();
+        let foundProduct = basket.find(p=>p.product.id == product_id);
+        if(foundProduct != undefined){
+            foundProduct.quantity += quantity;
+            if(foundProduct.quantity <= 0){
+                removeFromBasket(foundProduct.product.id);
+            }else{
+                setBasket(basket);
+            }
+        }
+        window.location.reload();
+    }
+    function setBasket(basket){
+        localStorage.setItem("basket",JSON.stringify(basket));
+    }
+    function removeFromBasket(produc){
+        let basket = getBasket();
+        basket = basket.filter(p=>p.product.id != produc);
+        setBasket(basket);
+    }
+    function deleteFrom(prduct){
+        removeFromBasket(prduct)
+        window.location.reload();
+    }
+    function getTotalPrice(){
+        let basket = getBasket();
+        let total = 0;
+        for(let product of basket){
+            total += product.quantity * product.price;
+        }
+        return total;
+    }
+    commander.addEventListener('click',(e)=>{
+        let myObject = getBasket();
+        if(myObject !=[]) {
+            axios.post('/myController', myObject)
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }else {
+            return;
+        }
+    });
+</script>
+</html>

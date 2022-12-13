@@ -4,7 +4,7 @@ import com.visionaryCrofting.demo.entity.CommandeItem;
 import java.util.List;
 import java.util.Optional;
 
-public interface CommanItemService {
+public interface CommandItemService {
     Optional<CommandeItem> getById(Long id);
     List<CommandeItem> getAll() ;
     int count();
