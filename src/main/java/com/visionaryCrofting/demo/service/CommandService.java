@@ -9,6 +9,9 @@ public interface CommandService {
     Commande getCommandeById(Long id);
     Commande getCommandeByRef(String ref);
     Commande addCommande(Commande commande);
+
+    Commande updateCommande(Commande commande);
+
     String deleteCommande(Long id);
 
 }

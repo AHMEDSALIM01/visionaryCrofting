@@ -50,7 +50,6 @@
     let cards = document.querySelector('.dvs')
     let tot = document.querySelector('.totel');
     let total = getTotalPrice();
-    let commander = document.querySelector('.commander')
     let plus = undefined;
     function getBasket(){
         let basket = localStorage.getItem("basket");
@@ -61,6 +60,7 @@
         }
     }
     document.addEventListener("DOMContentLoaded", function(event) {
+
         tot.innerHTML=`<div class="card bg-white border-0 shadow-sm ms-3 d-flex justify-content-center w-75" style="height:200px">
                         <div class="card-body">
                             <h5 class="mb-1">Resumé de panier</h5>
@@ -140,19 +140,39 @@
         }
         return total;
     }
-    commander.addEventListener('click',(e)=>{
-        let myObject = getBasket();
-        if(myObject !=[]) {
-            axios.post('/myController', myObject)
-                .then(function (response) {
-                    console.log(response);
+    function clearLocal(){
+        localStorage.clear();
+        window.location.reload();
+    }
+    window.onload=function (){
+        let commander = document.querySelector('.commander')
+        let reff=1;
+        commander.addEventListener('click',(e)=>{
+            let myObject = {
+                "commandeItems":getBasket(),
+                "prixTotal":total,
+                "status":"en-cours"
+            };
+            if(getBasket().length !=0) {
+                fetch('http://localhost:8080/commander', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(myObject)
                 })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        }else {
-            return;
-        }
-    });
+                    .then(response => response.json()
+                    ).then(response => {
+                    window.alert("commande efféctué avec succés")
+                    clearLocal()
+                    })
+                    .catch(error => {
+                        window.alert(error)
+                    });
+            }else {
+                return;
+            }
+        });
+    }
 </script>
 </html>
