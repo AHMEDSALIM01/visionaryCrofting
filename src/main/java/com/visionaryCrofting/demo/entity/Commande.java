@@ -1,8 +1,6 @@
 package com.visionaryCrofting.demo.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +10,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 
 @Entity
@@ -44,5 +43,20 @@ public class Commande implements Serializable {
     @OneToMany(mappedBy = "commande",cascade = CascadeType.ALL)
     //@JsonBackReference
     private List<CommandeItem> commandeItems;
+    @PrePersist
+    public void generateReference() {
+        byte [] bytes = new byte[4];
+        this.ref = UUID.nameUUIDFromBytes(bytes).toString();
+    }
 
+    @Override
+    public String toString() {
+        return "Commande{" +
+                "id=" + id +
+                ", ref='" + ref + '\'' +
+                ", date=" + date +
+                ", prixTotal=" + prixTotal +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }

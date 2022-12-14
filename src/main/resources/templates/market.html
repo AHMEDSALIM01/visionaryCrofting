@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:util="http://www.thymeleaf.org/extras/util">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{css/style.css}">
+    <title>Title</title>
+</head>
+<body class="vh-100 bg-light">
+    <nav class="navbar sticky-md-top navbar-expand-lg navbar-light bg-white">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                <a class="navbar-brand" href="#">Hidden brand</a>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Link</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled">Disabled</a>
+                    </li>
+                </ul>
+                <div class="nav-item  position-relative">
+                    <a class="nav-link text-black-50 text-decoration-none" th:href="@{panier}">Panier</a>
+                    <span class="position-absolute start-100 translate-middle badge rounded-pill bg-danger counter" style="top: 20%;">
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+<div>
+    <div>
+        <div class="row w-100">
+            <div class="col-3 p-3 d-flex justify-content-center overflow-auto">
+                <div class="bg-white d-flex justify-content-center w-75" style="height: 300px;">
+                    <ul class="list-unstyled">
+                        <h5 th:text="${'Categories'}" class="text-center"></h5>
+                        <li th:each="product:${products}">
+                            <input type="checkbox" class="my-checkbox" onclick="handleCheckboxClick()" th:value="${product.category}">
+                            <label th:text="${product.category}">
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-9 p-3">
+                <div th:each="product:${products}" class="card bg-white">
+                    <div class="row g-0">
+                        <div class="col-md-3">
+                            <img src="http://localhost:8080/shoop.jpg" alt="shop" class="w-100 h-100">
+                        </div>
+                        <div class="col-md-9">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="card-title nom" th:text="${product.nom}"></h5>
+                                    <h5 class="card-title price" th:data="${product.price}" th:text="${product.price}+' DH'"></h5>
+                                </div>
+                                <p class="card-text mb-5" th:text="${product.descreption}"></p>
+                                <p class="card-text" th:text="${product.category}"><small class="text-muted">Last updated 3 mins ago</small></p>
+                            </div>
+                            <div class="mb-2 me-2 d-flex justify-content-end">
+                                <button class="btn btn-danger acheter" th:data-id="${product.id}" th:data-nom="${product.nom}" th:data-descreption="${product.descreption}" th:data-price="${product.price}">Acheter ce produit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const checkbox = document.querySelectorAll('.my-checkbox');
+    let x='';
+    const btn = document.querySelectorAll('.acheter');
+    let counter = document.querySelector('.counter');
+    let commandeItem={}
+    let quantity=1;
+    let count =0;
+
+        for (const bt of btn) {
+            bt.addEventListener('click', evt => {
+                commandeItem = {
+                    "product": {
+                        "id": bt.getAttribute('data-id'),
+                        "descreption": bt.getAttribute('data-descreption'),
+                        "nom": bt.getAttribute('data-nom')
+                    },
+                    "quantity": quantity,
+                    "price": bt.getAttribute('data-price'),
+                    "ref": "ref-2022/" + count++
+                }
+                addBasket(commandeItem)
+                window.location.reload();
+                window.alert("produit ajouté avec succés")
+            })
+        }
+    document.addEventListener("DOMContentLoaded", function(event) {
+        counter.innerHTML = getNumberProduct();
+        console.log(getNumberProduct())
+    });
+
+    function sendLocalToServer(data){
+        let stringfy = JSON.stringify(data);
+        const searchParams = new URLSearchParams();
+        for (const [key, value] of Object.entries(stringfy)) {
+            searchParams.set(key, value);
+        }
+        window.location.href="/c/panier?"+searchParams;
+    }
+    function handleCheckboxClick() {
+        for (const check of checkbox) {
+            if (check.checked) {
+                x += check.value;
+                window.location.href='?'+x+'&'+x;
+            }
+        }
+
+    }
+    function setBasket(basket){
+        localStorage.setItem("basket",JSON.stringify(basket));
+    }
+    function getBasket(){
+        let basket = localStorage.getItem("basket");
+        if(basket == null){
+            return [];
+        }else{
+            return JSON.parse(basket);
+        }
+    }
+    function addBasket(product){
+        let basket = getBasket();
+        let foundProduct = basket.find(p=>p.product.id == product.product.id);
+        if(foundProduct != undefined){
+            foundProduct.quantity++;
+        }else{
+            product.quantity = 1;
+            basket.push(product);
+        }
+        setBasket(basket);
+    }
+    function removeFromBasket(product){
+        let basket = getBasket();
+        let foundProduct = basket.filter(p=>p.id != product.id);
+        setBasket(basket);
+    }
+    function changeQuantity(product,quantity){
+        let basket = getBasket();
+        let foundProduct = basket.find(p=>p.id != product.id);
+        if(foundProduct != undefined){
+            foundProduct.quantity += quantity;
+            if(foundProduct.quantity <= 0){
+                removeFromBasket(product)
+            }
+        }
+        setBasket(basket);
+    }
+    function getNumberProduct(){
+        let basket = getBasket();
+        let number = 0;
+        for(let product of basket){
+            number += product.quantity
+        }
+        return number;
+    }
+
+</script>
+</body>
+</html>

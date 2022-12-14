@@ -1,7 +1,6 @@
 package com.visionaryCrofting.demo.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,6 +34,7 @@ public class Product implements Serializable {
     private String descreption;
    @Column(name = "quantity")
     private int quantity;
+   private Double price;
     @OneToMany(mappedBy ="product" ,cascade = CascadeType.ALL)
     //@JsonManagedReference
     private List<CommandeItem> commandeItems;
@@ -43,12 +43,13 @@ public class Product implements Serializable {
     //@JsonManagedReference
     private Stock stock;
 
-    public Product(String ref, String nom, String category, String descreption, int quantity) {
+    public Product(String ref, String nom, String category, String descreption, int quantity,Double price) {
         this.ref=ref;
         this.nom=nom;
         this.category=category;
         this.descreption=descreption;
         this.quantity=quantity;
+        this.price=price;
     }
 
 

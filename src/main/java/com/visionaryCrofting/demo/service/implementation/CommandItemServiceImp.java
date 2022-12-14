@@ -3,7 +3,7 @@ package com.visionaryCrofting.demo.service.implementation;
 import com.visionaryCrofting.demo.entity.CommandeItem;
 import com.visionaryCrofting.demo.entity.Product;
 import com.visionaryCrofting.demo.repositories.CommandeItemRepository;
-import com.visionaryCrofting.demo.service.CommanItemService;
+import com.visionaryCrofting.demo.service.CommandItemService;
 import com.visionaryCrofting.demo.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class CommandItemServiceImp implements CommanItemService {
+public class CommandItemServiceImp implements CommandItemService {
     @Autowired
     CommandeItemRepository commandeItemRepository;
     @Autowired

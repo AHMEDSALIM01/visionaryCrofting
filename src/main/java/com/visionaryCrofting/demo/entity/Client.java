@@ -1,8 +1,6 @@
 package com.visionaryCrofting.demo.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,4 +38,14 @@ public class Client implements Serializable{
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "client")
     //@JsonBackReference
     List<Commande> commandes;
+
+    @Override
+    public String toString() {
+        return "Client{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", tel='" + tel + '\'' +
+                '}';
+    }
 }
